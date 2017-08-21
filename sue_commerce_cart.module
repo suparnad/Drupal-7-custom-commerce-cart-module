@@ -1,0 +1,36 @@
+<?php 
+
+/**
+ * Implements hook_form_alter
+ *
+ * Add the buttons to the cart form for our customised cart view
+ *
+ * This is needed to override the default actions on the cart actions footer element in the view
+ *
+ */
+function sue_commerce_cart_form_views_form_commerce_cart_form_mobile_block_alter(&$form, &$form_values, $form_id) {
+  drupal_set_message($form_id);
+// if (strpos($form_id, 'views_form_commerce_cart_form_mobile_block_') === 0) {
+    // Change the Save button to say Update cart.
+   // $form['actions']['update']['#value'] = t('Update cart');
+  $form['#action'] = url('cart');
+    $form['actions']['update']['#submit'] = array_merge($form['#submit'], array('commerce_cart_line_item_views_form_submit'));
+	
+    $form['actions']['checkout'] = array(
+      '#type' => 'submit',
+      '#value' => t('Checkout2'),
+      '#weight' => 5,
+      '#access' => user_access('access checkout'),
+      '#submit' => array_merge($form['#submit'], array('commerce_checkout_line_item_views_form_submit')),
+    );
+
+   // Change any Delete buttons to say Remove.
+    if (!empty($form['edit_delete'])) {
+      foreach(element_children($form['edit_delete']) as $line_item_id) {
+        $form['edit_delete'][$line_item_id]['#value'] = t('Remove');
+      }
+    }
+ // }
+}
+
+?>
